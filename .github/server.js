@@ -1,15 +1,4 @@
-const express = require('express')
-const app = express()
-
-// Start an app server
 const args = require('minimist')(process.argv.slice(2))
-args['port']
-const port = args.port || process.env.PORT || 5555
-const server = app.listen(port, () => {
-    console.log('App listening on port %PORT%'.replace('%PORT%',port))
-});
-// See what is stored in the object produced by minimist
-console.log(args)
 // Store help text 
 const help = (`
 server.js [options]
