@@ -22,6 +22,25 @@ if (args.help || args.h) {
     process.exit(0)
 }
 
+// define app
+let express = require("express")
+const { listen } = require('express/lib/application')
+let app = express()
+const fs = require('fs')
+const morgan = require('morgan')
+const db = require('./database.js')
+
+app.use(express.urlencoded({ extended: true}));
+app.use(express.json());
+
+// port
+const port = args.port || args.p || 5000
+
+// start server
+const server = app.listen(port, () => {
+    console.log("Server running on port %PORT%".replace("%PORT%",port))
+})
+
 // logging middleware
 const logging = (req, res, next) => {
     console.log()
