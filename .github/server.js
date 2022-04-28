@@ -71,53 +71,7 @@ app.use((req, res, next) => {
     next();
 })
 
-// logging middleware
-const logging = (req, res, next) => {
-    console.log()
-    next()
-}
-
-app.use(logging)
-
-app.get('/app/', (req, res) => {
-    // Respond with status 200
-        res.statusCode = 200;
-    // Respond with status message "OK"
-        res.statusMessage = 'OK';
-
-        // res.writeHead( res.statusCode, { 'Content-Type' : 'text/plain' });
-        res.end(res.statusCode+ ' ' +res.statusMessage)
-});
-
-
-
-
-// works
-app.get('/app/flip', (req, res) => {
-    res.status(200).json({ 'flip': coinFlip()})
-}) 
-  
-app.get('/app/flips/:number([0-9]{1,3})', (req, res) => {
-    let flips = coinFlips(req.params.number)
-    let count = countFlips(flips);
-    res.status(200).json({"raw":flips, "summary":count})
-})
-
-app.get('/app/flip/call/heads', (req, res) => {
-    let flipsCoinheads=flipACoin("heads")
-    res.status(200).json(flipsCoinheads)
-})
-
-app.get('/app/flip/call/tails', (req, res) => {
-    let flipsCointails=flipACoin("tails")
-    res.status(200).json(flipsCointails)
-})
-
-// Default response for any other request
-app.use(function(req, res){
-    res.status(404).send('404 NOT FOUND')
-});
-
+// coin flip stuff
 function coinFlip() {
  
     let num = Math.round(Math.random())%2;
@@ -127,11 +81,12 @@ function coinFlip() {
 }
 
 function coinFlips(flips) {
-    let arr= [];
-    for(let i=0; i<flips; i++) {
-      arr[i] = coinFlip();
+    let array = [];
+    for (let i = 1; i <= flips; i++) {
+        array.push(coinFlip());
     }
-    return arr;
+    return array;
+
 }
 
 function countFlips(array) {
@@ -156,3 +111,62 @@ function flipACoin(call) {
     return {call: call, flip: side, result: "win"}
 }
 
+
+app.get('/app/', (req, res, next) => {
+    res.json({"message":"Your API works! (200)"});
+	res.status(200);
+});
+
+
+
+
+// works
+app.get('/app/flip', (req, res) => {
+    res.status(200).json({ 'flip': coinFlip()})
+}) 
+  
+app.post('/app/flips/coins/', (req, res, next) => {
+    let flips = coinFlips(req.body.number)
+    let count = countFlips(flips);
+    res.status(200).json({"raw":flips,"summary":count})
+})
+
+app.get('/app/flips/:number', (req, res, next) => {
+    const flips = coinFlips(req.params.number)
+    const count = countFlips(flips)
+    res.status(200).json({"raw":flips,"summary":count})
+});
+
+
+app.post('/app/flip/call/', (req, res, next) => {
+    const game = flipACoin(req.body.guess)
+    res.status(200).json(game)
+})
+
+app.get('/app/flip/call/:guess(heads|tails)/', (req, res, next) => {
+    const game = flipACoin(req.params.guess)
+    res.status(200).json(game)
+})
+
+if (args.debug || args.d) {
+    app.get('/app/log/access/', (req, res, next) => {
+        const stmt = db.prepare("SELECT * FROM accesslog").all();
+	    res.status(200).json(stmt);
+    })
+
+    app.get('/app/error/', (req, res, next) => {
+        throw new Error('Error test works.')
+    })
+}
+
+// Default response for any other request
+app.use(function(req, res){
+    res.status(404).send('404 NOT FOUND')
+});
+
+
+process.on('SIGINT', () => {
+    server.close(() => {
+		console.log('\nApp stopped.');
+	});
+});
