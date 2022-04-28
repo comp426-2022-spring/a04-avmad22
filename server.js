@@ -105,16 +105,6 @@ app.get("/app/", (req, res) => {
     res.end(res.statusCode + ' ' + res.statusMessage);
 });
 
-// If --log=false then do not create a log file
-if (args.log == 'false') {
-    console.log("NOTICE: not creating file access.log")
-} else {
-// Use morgan for logging to files
-// Create a write stream to append to an access.log file
-    const accessLog = createWriteStream('access.log', { flags: 'a' })
-// Set up the access logging middleware
-    app.use(morgan('combined', { stream: accessLog }))
-}
 // Always log to database
 app.use((req, res, next) => {
     let logdata = {
@@ -136,16 +126,32 @@ app.use((req, res, next) => {
     next();
 })
 
+// debug
+if(DEBUG){
+    app.get("/app/log/access", (req,res) => {
+        try {
+            const stmt = db.prepare('SELECT * FROM accesslog').all()
+            res.status(200).json(stmt)
+        } catch {
+            console.error(e)
+        }
+    });
+    app.get("/app/error", (req,res) => {
+        throw new Error('Error test successful')
+    });
+}
 
+// If --log=false then do not create a log file
+if (args.log == 'false') {
+    console.log("NOTICE: not creating file access.log")
+} else {
+// Use morgan for logging to files
+// Create a write stream to append to an access.log file
+    const accessLog = createWriteStream('access.log', { flags: 'a' })
+// Set up the access logging middleware
+    app.use(morgan('combined', { stream: accessLog }))
+}
 
-app.get('/app/', (req, res) => {
-    // Respond with status 200
-        res.statusCode = 200;
-    // Respond with status message "OK"
-        res.statusMessage = 'OK';
-        res.writeHead( res.statusCode, { 'Content-Type' : 'text/plain' });
-        res.end(res.statusCode+ ' ' +res.statusMessage)
-});
 
 
 
@@ -176,12 +182,13 @@ app.get('/app/flip/call/tails', (req, res) => {
 
 // Default response for any other request
 app.use(function(req, res){
-    res.status(404).send('404 NOT FOUND')
+    res.json({"message":"Endpoint not found. (404)"});
+    res.status(404);
 });
 
 
-process.on('SIGINT', () => {
+process.on('SIGTERM', () => {
     server.close(() => {
-		console.log('\nApp stopped.');
+		console.log('Server stopped.');
 	});
 });
