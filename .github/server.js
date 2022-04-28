@@ -1,12 +1,20 @@
 const args = require('minimist')(process.argv.slice(2))
+
+args["port", "debug", "log", "help"]
+const port = args.port || 5000 || process.env.PORT
+const debug = args.debug
+const log = args.log
+const help = args.help
+console.log(args)
 // port
-const port = args.port || args.p || 5555;
+
 
 
 // define app
-let express = require("express")
+const express = require("express")
+const app = express()
 const { listen } = require('express/lib/application')
-let app = express()
+
 const fs = require('fs')
 const morgan = require('morgan')
 const db = require('./database.js')
@@ -31,7 +39,7 @@ if (args.log =='false') {
 }
 
 // Store help text 
-const help = (`
+const help_text = (`
 server.js [options]
 
 --port, p	Set the port number for the server to listen on. Must be an integer
@@ -49,7 +57,7 @@ server.js [options]
 `);
 // If --help or -h, echo help text to STDOUT and exit
 if (args.help || args.h) {
-    console.log(help)
+    console.log(help_text)
     process.exit(0)
 }
 
