@@ -147,7 +147,7 @@ if (args.log == 'false') {
 } else {
 // Use morgan for logging to files
 // Create a write stream to append to an access.log file
-    const accessLog = createWriteStream('access.log', { flags: 'a' })
+    const accessLog = fs.createWriteStream('access.log', { flags: 'a' })
 // Set up the access logging middleware
     app.use(morgan('combined', { stream: accessLog }))
 }
