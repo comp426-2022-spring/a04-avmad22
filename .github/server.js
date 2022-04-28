@@ -84,14 +84,21 @@ app.use((req, res, next) => {
 })
 
 if (args.debug || args.d) {
-    app.get('/app/log/access/', (req, res, next) => {
-        const stmt = db.prepare("SELECT * FROM accesslog").all();
-	    res.status(200).json(stmt);
-    })
+    try{
+        app.get("/app/log/access", (req, res, next) => {
+        const stmt = db.prepare('SELECT * FROM accesslog');
+        const stmtAll = stmt.all();
+        res.status(200).json(stmtAll)
+        });
+    } catch (e) {
+        console.error(e)
+    }
 
     app.get('/app/error', (req, res) => {
         throw new Error('Error test successful.')
     })
+} else {
+    app.use(morgan('combined'))
 }
 
 // coin flip stuff
