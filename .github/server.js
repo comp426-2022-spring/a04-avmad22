@@ -33,18 +33,52 @@ if (args.help || args.h) {
     process.exit(0)
 }
 
+// logging middleware
+const logging = (req, res, next) => {
+    console.log()
+    next()
+}
 
-
+app.use(logging)
 
 app.get('/app/', (req, res) => {
     // Respond with status 200
         res.statusCode = 200;
     // Respond with status message "OK"
         res.statusMessage = 'OK';
-        res.writeHead( res.statusCode, { 'Content-Type' : 'text/plain' });
+
+        // res.writeHead( res.statusCode, { 'Content-Type' : 'text/plain' });
         res.end(res.statusCode+ ' ' +res.statusMessage)
 });
 
+
+
+
+// works
+app.get('/app/flip', (req, res) => {
+    res.status(200).json({ 'flip': coinFlip()})
+}) 
+  
+app.get('/app/flips/:number([0-9]{1,3})', (req, res) => {
+    let flips = coinFlips(req.params.number)
+    let count = countFlips(flips);
+    res.status(200).json({"raw":flips, "summary":count})
+})
+
+app.get('/app/flip/call/heads', (req, res) => {
+    let flipsCoinheads=flipACoin("heads")
+    res.status(200).json(flipsCoinheads)
+})
+
+app.get('/app/flip/call/tails', (req, res) => {
+    let flipsCointails=flipACoin("tails")
+    res.status(200).json(flipsCointails)
+})
+
+// Default response for any other request
+app.use(function(req, res){
+    res.status(404).send('404 NOT FOUND')
+});
 
 function coinFlip() {
  
@@ -83,32 +117,4 @@ function flipACoin(call) {
     } else {result="lose";}
     return {call: call, flip: side, result: "win"}
 }
-
-// works
-app.get('/app/flip', (req, res) => {
-    res.status(200).json({ 'flip': coinFlip()})
-}) 
-  
-app.get('/app/flips/:number([0-9]{1,3})', (req, res) => {
-    let flips = coinFlips(req.params.number)
-    let count = countFlips(flips);
-    res.status(200).json({"raw":flips, "summary":count})
-})
-
-app.get('/app/flip/call/heads', (req, res) => {
-    let flipsCoinheads=flipACoin("heads")
-    res.status(200).json(flipsCoinheads)
-})
-
-app.get('/app/flip/call/tails', (req, res) => {
-    let flipsCointails=flipACoin("tails")
-    res.status(200).json(flipsCointails)
-})
-
-// Default response for any other request
-app.use(function(req, res){
-    res.status(404).send('404 NOT FOUND')
-});
-
-  
 
