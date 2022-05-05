@@ -1,0 +1,26 @@
+{
+  "name": "a04-avmad22",
+  "version": "1.0.0",
+  "description": "Connecting API to database and record access logs",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/comp426-2022-spring/a04-avmad22.git"
+  },
+  "author": "avmad22",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/comp426-2022-spring/a04-avmad22/issues"
+  },
+  "homepage": "https://github.com/comp426-2022-spring/a04-avmad22#readme",
+  "dependencies": {
+    "better-sqlite3": "^7.5.1",
+    "express": "^4.18.0",
+    "fs": "^0.0.1-security",
+    "minimist": "^1.2.6",
+    "morgan": "^1.10.0"
+  }
+}
